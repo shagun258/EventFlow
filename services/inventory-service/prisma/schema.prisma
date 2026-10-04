@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReservationStatus {
+  RESERVED
+  CONFIRMED
+  RELEASED
+}
+
+// productId references product-service by ID only (database-per-service: no cross-DB foreign keys).
+model Inventory {
+  productId String   @id
+  quantity  Int      // physical units on hand
+  reserved  Int      @default(0) // held for unpaid orders. available = quantity - reserved
+  updatedAt DateTime @updatedAt
+}
+
+model Reservation {
+  id        String            @id @default(uuid())
+  orderId   String            @unique // one reservation per order -> idempotent reserve
+  status    ReservationStatus @default(RESERVED)
+  items     ReservationItem[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  @@index([status])
+}
+
+model ReservationItem {
+  id            String      @id @default(uuid())
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  productId     String
+  quantity      Int
+  @@index([reservationId])
+}

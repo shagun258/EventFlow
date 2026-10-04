@@ -1,0 +1,14 @@
+syntax = "proto3";
+package analytics;
+// ADMIN only (JWT in metadata "authorization").
+service AnalyticsService {
+  rpc GetAnalytics (Empty) returns (AnalyticsSummary);
+  rpc ListEvents (ListEventsRequest) returns (ListEventsResponse);
+}
+message Empty {}
+message TopicCount { string topic = 1; int32 count = 2; }
+message AnalyticsSummary { int32 total_events = 1; repeated TopicCount by_topic = 2; int32 orders_created = 3; int32 orders_cancelled = 4;
+  int32 payments_completed = 5; int32 payments_failed = 6; double revenue = 7; }
+message EventRecord { string event_id = 1; string topic = 2; string source = 3; string entity_id = 4; string payload_json = 5; string occurred_at = 6; }
+message ListEventsRequest { string topic = 1; int32 page = 2; int32 page_size = 3; }
+message ListEventsResponse { repeated EventRecord events = 1; int32 total = 2; }

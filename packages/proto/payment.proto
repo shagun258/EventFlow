@@ -1,0 +1,11 @@
+syntax = "proto3";
+package payment;
+// SIMULATED payment processing. No real money is involved.
+service PaymentService {
+  rpc CreatePayment (CreatePaymentRequest) returns (PaymentResponse);
+  rpc GetPaymentStatus (GetPaymentStatusRequest) returns (PaymentResponse);
+}
+enum PaymentStatus { PENDING = 0; PROCESSING = 1; COMPLETED = 2; FAILED = 3; REFUNDED = 4; CANCELLED = 5; }
+message CreatePaymentRequest { string order_id = 1; string user_id = 2; double amount = 3; }
+message GetPaymentStatusRequest { string order_id = 1; }
+message PaymentResponse { string payment_id = 1; string order_id = 2; PaymentStatus status = 3; string failure_reason = 4; double amount = 5; }

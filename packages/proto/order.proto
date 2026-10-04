@@ -1,0 +1,20 @@
+syntax = "proto3";
+package order;
+// Caller identity comes from the JWT in metadata "authorization", never from request fields.
+service OrderService {
+  rpc CreateOrder (CreateOrderRequest) returns (Order);
+  rpc GetOrder (GetOrderRequest) returns (Order);
+  rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse);   // all=true requires ADMIN
+  rpc CancelOrder (CancelOrderRequest) returns (Order);
+  rpc UpdateOrderStatus (UpdateOrderStatusRequest) returns (Order);  // ADMIN only
+}
+message OrderItem { string product_id = 1; string product_name = 2; double unit_price = 3; int32 quantity = 4; }
+message Order { string id = 1; string order_number = 2; string user_id = 3; string status = 4; double total = 5; string failure_reason = 6;
+  repeated OrderItem items = 7; string payment_status = 8; string created_at = 9; string updated_at = 10; }
+message OrderLine { string product_id = 1; int32 quantity = 2; }
+message CreateOrderRequest { repeated OrderLine items = 1; }
+message GetOrderRequest { string id = 1; }
+message ListOrdersRequest { bool all = 1; string status = 2; int32 page = 3; int32 page_size = 4; }
+message ListOrdersResponse { repeated Order orders = 1; int32 total = 2; }
+message CancelOrderRequest { string id = 1; string reason = 2; }
+message UpdateOrderStatusRequest { string id = 1; string status = 2; }

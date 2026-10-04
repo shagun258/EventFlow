@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique // one cart per user; references auth-service by ID only
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+// Only productId + quantity are stored. Name/price are looked up live so the cart never shows stale prices.
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  quantity  Int
+  createdAt DateTime @default(now())
+  @@unique([cartId, productId])
+}

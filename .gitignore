@@ -1,0 +1,9 @@
+node_modules
+dist
+generated
+.next
+.env
+coverage
+*.log
+next-env.d.ts
+*.tsbuildinfo

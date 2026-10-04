@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+// SIMULATED payments only. No card data, no real money.
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String        @unique // one payment per order -> idempotent create
+  userId        String
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus @default(PENDING)
+  failureReason String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  @@index([userId])
+  @@index([status])
+}

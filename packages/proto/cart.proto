@@ -1,0 +1,14 @@
+syntax = "proto3";
+package cart;
+// Identity comes from the JWT in metadata "authorization". Every user has exactly one cart.
+service CartService {
+  rpc GetCart (Empty) returns (Cart);
+  rpc AddToCart (CartItemInput) returns (Cart);       // adds quantity to any existing line
+  rpc UpdateCartItem (CartItemInput) returns (Cart);  // sets absolute quantity
+  rpc RemoveFromCart (RemoveRequest) returns (Cart);
+}
+message Empty {}
+message CartItemInput { string product_id = 1; int32 quantity = 2; }
+message RemoveRequest { string product_id = 1; }
+message CartItem { string product_id = 1; string product_name = 2; double unit_price = 3; int32 quantity = 4; double line_total = 5; bool unavailable = 6; }
+message Cart { repeated CartItem items = 1; double total = 2; int32 item_count = 3; }

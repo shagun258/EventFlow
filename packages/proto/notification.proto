@@ -1,0 +1,11 @@
+syntax = "proto3";
+package notification;
+// Identity comes from the JWT in metadata "authorization".
+service NotificationService {
+  rpc ListNotifications (ListNotificationsRequest) returns (ListNotificationsResponse);
+  rpc MarkRead (MarkReadRequest) returns (Notification);
+}
+message Notification { string id = 1; string type = 2; string message = 3; string order_id = 4; bool read = 5; string created_at = 6; }
+message ListNotificationsRequest { bool unread_only = 1; int32 page = 2; int32 page_size = 3; }
+message ListNotificationsResponse { repeated Notification notifications = 1; int32 total = 2; int32 unread_count = 3; }
+message MarkReadRequest { string id = 1; }

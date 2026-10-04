@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PAYMENT_FAILED
+  CANCELLED
+  REJECTED
+  SHIPPED
+  DELIVERED
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  orderNumber   String      @unique
+  userId        String      // references auth-service by ID only
+  status        OrderStatus @default(PENDING)
+  total         Decimal     @db.Decimal(10, 2)
+  failureReason String?
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+// Name and price are snapshots taken from product-service at order time.
+model OrderItem {
+  id          String  @id @default(uuid())
+  orderId     String
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String
+  productName String
+  unitPrice   Decimal @db.Decimal(10, 2)
+  quantity    Int
+  @@index([orderId])
+}

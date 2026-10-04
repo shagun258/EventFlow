@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Append-only log of every domain event, used for the admin analytics dashboard.
+model EventLog {
+  id         String   @id @default(uuid())
+  eventId    String   @unique // dedupe key: Kafka redelivery never double-counts
+  topic      String
+  source     String
+  entityId   String?  // orderId / productId / userId
+  payload    Json
+  occurredAt DateTime
+  recordedAt DateTime @default(now())
+  @@index([topic, occurredAt])
+  @@index([entityId])
+}

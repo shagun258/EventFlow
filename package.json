@@ -1,0 +1,28 @@
+{
+  "name": "eventflow-commerce",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up",
+    "infra": "docker compose up -d postgres redis kafka",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,yml}\"",
+    "generate": "npm run generate --workspaces --if-present",
+    "up": "docker compose up --build",
+    "down": "docker compose down"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,44 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build (runs prisma generate, compiles every service, builds the Next.js frontend)
+        run: npm run build
+        env: { NEXT_TELEMETRY_DISABLED: "1" }
+      - name: Test (unit + GraphQL API tests)
+        run: npm test
+      - name: Validate Docker Compose file
+        run: docker compose config -q
+
+  docker-images:
+    needs: build-test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: auth-service }
+          - { name: product-service }
+          - { name: cart-service }
+          - { name: order-service }
+          - { name: inventory-service }
+          - { name: payment-service }
+          - { name: notification-service }
+          - { name: analytics-service }
+          - { name: api-gateway, args: "--build-arg DIR=apps" }
+          - { name: frontend, file: frontend }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image (not pushed)
+        run: docker build -f infrastructure/docker/${{ matrix.file || 'service' }}.Dockerfile --build-arg SERVICE=${{ matrix.name }} ${{ matrix.args }} -t eventflow/${{ matrix.name }}:ci .

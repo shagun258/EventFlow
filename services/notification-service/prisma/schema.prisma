@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  eventId   String   @unique // source event id -> each Kafka event yields at most one notification (idempotent)
+  userId    String
+  type      String
+  message   String
+  orderId   String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+  @@index([userId, read])
+}

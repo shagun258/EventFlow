@@ -1,0 +1,21 @@
+syntax = "proto3";
+package product;
+// Write RPCs require a JWT (ADMIN) in gRPC metadata key "authorization".
+service ProductService {
+  rpc ListProducts (ListProductsRequest) returns (ListProductsResponse);
+  rpc GetProduct (GetProductRequest) returns (Product);
+  rpc ListCategories (Empty) returns (ListCategoriesResponse);
+  rpc CreateProduct (ProductInput) returns (Product);
+  rpc UpdateProduct (UpdateProductRequest) returns (Product);
+  rpc DeleteProduct (GetProductRequest) returns (DeleteResponse);
+}
+message Empty {}
+message Category { string id = 1; string name = 2; string slug = 3; }
+message Product { string id = 1; string name = 2; string description = 3; double price = 4; string image_url = 5; string category_id = 6; string category_name = 7; string created_at = 8; }
+message ListProductsRequest { string search = 1; string category_id = 2; int32 page = 3; int32 page_size = 4; }
+message ListProductsResponse { repeated Product products = 1; int32 total = 2; }
+message GetProductRequest { string id = 1; }
+message ListCategoriesResponse { repeated Category categories = 1; }
+message ProductInput { string name = 1; string description = 2; double price = 3; string image_url = 4; string category_id = 5; }
+message UpdateProductRequest { string id = 1; ProductInput data = 2; }
+message DeleteResponse { bool success = 1; }

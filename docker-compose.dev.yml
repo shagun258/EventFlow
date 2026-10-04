@@ -1,0 +1,9 @@
+# Dev overrides: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build   (or: npm run dev)
+# Faster simulated payments, relaxed rate limit, Kafka reachable from the host at localhost:29092 (already published).
+services:
+  payment-service:
+    environment:
+      PAYMENT_PROCESSING_MS: "300"
+  api-gateway:
+    environment:
+      RATE_LIMIT_PER_MIN: "1000"
