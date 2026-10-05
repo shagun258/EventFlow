@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # EventFlow Commerce
 
 An event-driven e-commerce platform built as **real microservices**: NestJS services talking over **gRPC** (synchronous) and **Kafka** (asynchronous), fronted by a **GraphQL** gateway and a **Next.js** storefront. Everything runs with one command. Payments are **simulated**; no real money or card data is involved.
@@ -107,3 +108,7 @@ No transactional outbox (DB write + Kafka publish is not atomic; compensation co
 - **Reset everything:** `docker compose down -v`.
 
 MIT licensed (replace the name in `LICENSE`).
+=======
+# EventFlow
+Eventflow Project
+>>>>>>> origin/main

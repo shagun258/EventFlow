@@ -1,8 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+﻿import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEnvelope, EventPublisher, Topics } from '@eventflow/kafka-events';
 import { isPrismaCode, rpcError, status } from '@eventflow/service-common';
 import { PrismaService } from './prisma.service';
 
+/** DI token for the simulated-payment settings (an interface cannot be injected by type). */
+export const SIM_CONFIG = 'SIM_CONFIG';
 export interface SimConfig { failAbove: number; failureRate: number; processingMs: number; rng: () => number }
 export const envConfig = (): SimConfig => ({
   failAbove: Number(process.env.PAYMENT_FAIL_ABOVE ?? 1000), failureRate: Number(process.env.PAYMENT_FAILURE_RATE ?? 0),
@@ -19,7 +21,7 @@ export function decidePayment(amount: number, cfg: Pick<SimConfig, 'failAbove' |
 @Injectable()
 export class PaymentService {
   private readonly log = new Logger('PaymentService');
-  constructor(private readonly prisma: PrismaService, private readonly events: EventPublisher, private readonly cfg: SimConfig = envConfig()) {}
+  constructor(private readonly prisma: PrismaService, private readonly events: EventPublisher, @Inject(SIM_CONFIG) private readonly cfg: SimConfig) {}
 
   /** gRPC entry point. Idempotent per orderId. Creates the record as PENDING; processing happens on order.created. */
   async createPayment(dto: { orderId: string; userId: string; amount: number }) {
